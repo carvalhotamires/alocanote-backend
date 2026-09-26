@@ -36,7 +36,7 @@ public class User {
     private String customRole;
 
     @Column(name = "access_level", nullable = false)
-    private String accessLevel; // ROLE_ADMIN ou ROLE_USER
+    private String accessLevel;
 
     private String profilePictureUrl;
 

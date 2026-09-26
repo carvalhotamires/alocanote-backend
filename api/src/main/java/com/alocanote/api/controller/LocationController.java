@@ -21,8 +21,8 @@ public class LocationController {
     }
 
     @GetMapping
-    public ResponseEntity> getAllLocations() {
-        List locations = locationRepository.findAll();
+    public ResponseEntity<List<Location>> getAllLocations() {
+        List<Location> locations = locationRepository.findAll();
         return ResponseEntity.ok(locations);
     }
 

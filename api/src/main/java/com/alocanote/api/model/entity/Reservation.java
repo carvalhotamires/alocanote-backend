@@ -23,19 +23,18 @@ public class Reservation {
     private Long id;
 
     @Column(nullable = false)
-    private LocalDateTime departureDateTime; // Data e Horário de Retirada
+    private LocalDateTime departureDateTime;
 
     @Column(nullable = false)
-    private LocalDateTime returnDateTime; // Data e Horário de Devolução Prevista
+    private LocalDateTime returnDateTime;
 
     @Column(nullable = false)
-    private String purpose; // Projeto / Finalidade no Promob
+    private String purpose;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ReservationStatus status; // Alterado para o Enum correto
+    private ReservationStatus status;
 
-    // O relacionamento crucial que faltava com o equipamento
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "notebook_id", nullable = false)
     private Notebook notebook;

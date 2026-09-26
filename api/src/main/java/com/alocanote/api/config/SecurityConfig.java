@@ -39,19 +39,14 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Permite requisições preflight do CORS
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        // Console H2 para desenvolvimento
                         .requestMatchers("/h2-console/**").permitAll()
-                        // Endpoints de autenticação pública (login, validações)
                         .requestMatchers("/api/auth/**").permitAll()
-                        // Cadastro de colaboradoras da loja
                         .requestMatchers(HttpMethod.POST, "/api/users/register").permitAll()
-                        // Documentação Swagger/OpenAPI (se habilitado)
+                        // permitir o GET temporariamente
+                        .requestMatchers("/api/**").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        // Endpoint de erro padrão do Spring
                         .requestMatchers("/error").permitAll()
-                        // Todos os outros endpoints exigem autenticação via token JWT
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex

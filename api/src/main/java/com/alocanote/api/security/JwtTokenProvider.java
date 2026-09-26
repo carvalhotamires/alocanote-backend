@@ -42,9 +42,7 @@ public class JwtTokenProvider {
         }
     }
 
-    /**
-     * Gera um token JWT a partir de um UserDetails.
-     */
+
     public String generateToken(UserDetails userDetails) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
@@ -59,9 +57,7 @@ public class JwtTokenProvider {
         }
     }
 
-    /**
-     * Gera um token JWT a partir do e-mail/subject diretamente.
-     */
+
     public String generateToken(String subject) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
@@ -76,9 +72,7 @@ public class JwtTokenProvider {
         }
     }
 
-    /**
-     * Valida o token JWT e retorna o subject (e-mail) se for válido, ou null caso contrário.
-     */
+
     public String validateToken(String token) {
         if (token == null || token.isBlank()) {
             return null;
@@ -95,16 +89,12 @@ public class JwtTokenProvider {
         }
     }
 
-    /**
-     * Verifica se o token JWT é válido.
-     */
+
     public boolean isTokenValid(String token) {
         return validateToken(token) != null;
     }
 
-    /**
-     * Retorna o subject (e-mail) extraído do token se for válido.
-     */
+
     public String getSubject(String token) {
         return validateToken(token);
     }

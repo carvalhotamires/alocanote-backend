@@ -2,6 +2,7 @@ package com.alocanote.api.controller;
 
 import com.alocanote.api.model.entity.Notebook;
 import com.alocanote.api.service.NotebookService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +16,12 @@ public class NotebookController {
 
     public NotebookController(NotebookService notebookService) {
         this.notebookService = notebookService;
+    }
+
+    @PostMapping
+    public ResponseEntity<Notebook> criarNotebook(@RequestBody Notebook notebook) {
+        Notebook novoNotebook = notebookService.createNotebook(notebook);
+        return ResponseEntity.status(HttpStatus.CREATED).body(novoNotebook);
     }
 
     @GetMapping

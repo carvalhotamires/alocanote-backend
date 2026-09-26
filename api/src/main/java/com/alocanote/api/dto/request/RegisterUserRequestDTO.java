@@ -22,5 +22,5 @@ public class RegisterUserRequestDTO {
     @NotNull(message = "O cargo é obrigatório")
     private Role role;
 
-    private String customRole; // Utilizado apenas se role for OUTROS
+    private String customRole;
 }

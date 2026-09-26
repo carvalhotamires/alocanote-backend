@@ -9,9 +9,9 @@ import java.util.Optional;
 @Repository
 public interface LocationRepository extends JpaRepository<Location, Long> {
 
-    // Procura um local pelo nome
+
     Optional<Location> findByName(String name);
 
-    // Procura um local especificamente pelo CEP
+
     Optional<Location> findByCep(String cep);
 }
