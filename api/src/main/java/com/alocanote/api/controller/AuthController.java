@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import com.alocanote.api.dto.request.SendSmsRequestDTO;
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*")
 public class AuthController {
 
     private final UserRepository userRepository;
