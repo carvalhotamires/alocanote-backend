@@ -17,6 +17,9 @@ spring:
       ddl-auto: update
     show-sql: true
 
+jackson:
+  serialization:
+    fail-on-empty-beans: false
 
   h2:
     console:
