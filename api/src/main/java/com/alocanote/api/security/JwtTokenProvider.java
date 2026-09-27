@@ -22,9 +22,7 @@ public class JwtTokenProvider {
     @Value("${api.security.token.expiration:86400000}")
     private Long expiration;
 
-    /**
-     * Gera um token JWT a partir de uma entidade User.
-     */
+
     public String generateToken(User user) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);

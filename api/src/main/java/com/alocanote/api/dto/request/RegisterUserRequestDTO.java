@@ -16,6 +16,9 @@ public class RegisterUserRequestDTO {
     @Email(message = "E-mail inválido")
     private String email;
 
+    @NotBlank
+    private String password;
+
     @NotBlank(message = "O telefone é obrigatório")
     private String phone;
 
