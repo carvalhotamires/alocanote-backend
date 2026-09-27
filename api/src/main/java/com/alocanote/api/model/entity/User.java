@@ -28,6 +28,9 @@ public class User {
     @Column(nullable = false, unique = true)
     private String phone;
 
+    @Column(nullable = false)
+    private String password;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "role_enum", nullable = false)
     private Role role;
