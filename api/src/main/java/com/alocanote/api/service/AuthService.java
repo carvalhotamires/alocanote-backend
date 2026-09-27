@@ -30,6 +30,8 @@ public class AuthService {
         User user = userRepository.findByPhone(phone)
                 .orElseThrow(() -> new BusinessException("Utilizador não encontrado com este telemóvel."));
 
+        tokenRepository.findByUser(user).ifPresent(tokenRepository::delete);
+
         // Gera código de 6 dígitos (000000 a 999999)
         String code = String.format("%06d", new Random().nextInt(1000000));
 
