@@ -1,6 +1,7 @@
 package com.alocanote.api.model.entity;
 
 import com.alocanote.api.model.enums.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
@@ -30,6 +31,7 @@ public class User {
     @Column(nullable = false, unique = true)
     private String phone;
 
+    @JsonIgnore
     @Column(nullable = false)
     private String password;
 
