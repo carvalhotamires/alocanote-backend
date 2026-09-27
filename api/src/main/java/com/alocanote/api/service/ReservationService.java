@@ -11,7 +11,6 @@ import com.alocanote.api.model.enums.NotebookStatus;
 import com.alocanote.api.model.enums.ReservationStatus;
 import com.alocanote.api.repository.LocationRepository;
 import com.alocanote.api.repository.ReservationRepository;
-import com.alocanote.api.repository.NotebookRepository;
 import com.alocanote.api.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +37,6 @@ public class ReservationService {
 
     @Transactional
     public Reservation createReservation(CreateReservationRequestDTO dto, String userEmail) {
-        // Validação da ordem das datas
         if (dto.endTime().isBefore(dto.startTime())) {
             throw new BusinessException("A data de término deve ser posterior à data de início.");
         }
@@ -49,7 +47,6 @@ public class ReservationService {
             throw new BusinessException("Este notebook está em manutenção e não pode ser reservado.");
         }
 
-        // Verifica conflitos de horário para o mesmo notebook no período solicitado
         List<Reservation> conflitos = reservationRepository.findConflictingReservations(
                 dto.notebookId(),
                 dto.startTime(),
@@ -61,11 +58,9 @@ public class ReservationService {
             throw new BusinessException("Este notebook já possui um agendamento conflitante para este intervalo de horário.");
         }
 
-        // Recupera o usuário logado com base no subject do token JWT
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário autenticado não encontrado."));
 
-        // Recupera a localização indicada no DTO
         Location location = locationRepository.findById(dto.locationId())
                 .orElseThrow(() -> new ResourceNotFoundException("Local de retirada não encontrado com o ID: " + dto.locationId()));
 
@@ -80,5 +75,65 @@ public class ReservationService {
                 .build();
 
         return reservationRepository.save(reservation);
+    }
+
+    // Retorna as reservas pertencentes ao usuário autenticado
+    @Transactional(readOnly = true)
+    public List<Reservation> findMyReservations(String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
+        return reservationRepository.findByUserId(user.getId());
+    }
+
+    // Busca reserva por ID garantindo a posse do recurso
+    @Transactional(readOnly = true)
+    public Reservation findById(Long reservationId, String userEmail) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Reserva não encontrada com o ID: " + reservationId));
+
+        validarPosseReserva(reservation, userEmail);
+        return reservation;
+    }
+
+    // Realiza o Check-in (atualiza status para CHECKED_IN)
+    @Transactional
+    public Reservation checkIn(Long reservationId, String userEmail) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Reserva não encontrada com o ID: " + reservationId));
+
+        validarPosseReserva(reservation, userEmail);
+
+        if (reservation.getStatus() != ReservationStatus.AGENDADO) {
+            throw new BusinessException("Só é possível fazer check-in de reservas com status AGENDADO.");
+        }
+
+        reservation.setStatus(ReservationStatus.CHECKED_IN);
+        notebookService.updateStatus(reservation.getNotebook().getId(), NotebookStatus.EM_USO);
+
+        return reservationRepository.save(reservation);
+    }
+
+    // Realiza o cancelamento da reserva e libera o equipamento
+    @Transactional
+    public Reservation cancelReservation(Long reservationId, String userEmail) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Reserva não encontrada com o ID: " + reservationId));
+
+        validarPosseReserva(reservation, userEmail);
+
+        if (reservation.getStatus() == ReservationStatus.FINALIZADO || reservation.getStatus() == ReservationStatus.CANCELADO) {
+            throw new BusinessException("Esta reserva já foi finalizada ou cancelada.");
+        }
+
+        reservation.setStatus(ReservationStatus.CANCELADO);
+        notebookService.updateStatus(reservation.getNotebook().getId(), NotebookStatus.DISPONIVEL);
+
+        return reservationRepository.save(reservation);
+    }
+
+    private void validarPosseReserva(Reservation reservation, String userEmail) {
+        if (!reservation.getUser().getEmail().equals(userEmail)) {
+            throw new BusinessException("Acesso negado: esta reserva pertence a outro usuário.");
+        }
     }
 }

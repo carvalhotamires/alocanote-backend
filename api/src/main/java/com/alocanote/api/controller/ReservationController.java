@@ -10,6 +10,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/reservations")
 public class ReservationController {
@@ -25,9 +27,42 @@ public class ReservationController {
             @Valid @RequestBody CreateReservationRequestDTO dto,
             @AuthenticationPrincipal UserDetails userDetails) {
 
-        // userDetails.getUsername() contém o e-mail do usuário extraído do JWT pelo SecurityFilter
         Reservation novaReserva = reservationService.createReservation(dto, userDetails.getUsername());
-
         return ResponseEntity.status(HttpStatus.CREATED).body(novaReserva);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Reservation>> listarMinhasReservas(
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        List<Reservation> reservas = reservationService.findMyReservations(userDetails.getUsername());
+        return ResponseEntity.ok(reservas);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Reservation> buscarPorId(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        Reservation reserva = reservationService.findById(id, userDetails.getUsername());
+        return ResponseEntity.ok(reserva);
+    }
+
+    @PatchMapping("/{id}/check-in")
+    public ResponseEntity<Reservation> checkIn(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        Reservation reservaAtualizada = reservationService.checkIn(id, userDetails.getUsername());
+        return ResponseEntity.ok(reservaAtualizada);
+    }
+
+    @PatchMapping("/{id}/cancel")
+    public ResponseEntity<Reservation> cancelar(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        Reservation reservaAtualizada = reservationService.cancelReservation(id, userDetails.getUsername());
+        return ResponseEntity.ok(reservaAtualizada);
     }
 }
