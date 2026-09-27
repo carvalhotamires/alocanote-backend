@@ -1,24 +1,23 @@
 package com.alocanote.api.service;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import com.alocanote.api.dto.request.RegisterUserRequestDTO;
 import com.alocanote.api.model.entity.User;
 import com.alocanote.api.repository.UserRepository;
-import com.alocanote.api.exception.BusinessException; // Exemplo de exceção personalizada
+import com.alocanote.api.exception.BusinessException;
 import com.alocanote.api.exception.ResourceNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
-
-    // Injeção de dependência via construtor
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    private final PasswordEncoder passwordEncoder; // Injetado automaticamente pelo Lombok
 
     @Transactional
     public User createUser(RegisterUserRequestDTO dto) {
@@ -39,6 +38,7 @@ public class UserService {
                 .phone(dto.getPhone())
                 .role(dto.getRole())
                 .customRole(dto.getCustomRole())
+                .password(passwordEncoder.encode(dto.getPassword()))
                 .build();
 
         return userRepository.save(user);
