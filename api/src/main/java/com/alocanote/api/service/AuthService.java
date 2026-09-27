@@ -2,6 +2,7 @@ package com.alocanote.api.service;
 
 import com.alocanote.api.model.entity.User;
 import com.alocanote.api.model.entity.VerificationToken;
+import com.alocanote.api.repository.UserRepository;
 import com.alocanote.api.repository.VerificationTokenRepository;
 import com.alocanote.api.exception.BusinessException;
 import org.springframework.stereotype.Service;
@@ -13,37 +14,51 @@ import java.util.Random;
 @Service
 public class AuthService {
 
-    private final UserService userService;
+    private final UserRepository userRepository;
     private final SmsService smsService;
     private final VerificationTokenRepository tokenRepository;
 
-    public AuthService(UserService userService, SmsService smsService, VerificationTokenRepository tokenRepository) {
-        this.userService = userService;
+    public AuthService(UserRepository userRepository, SmsService smsService, VerificationTokenRepository tokenRepository) {
+        this.userRepository = userRepository;
         this.smsService = smsService;
         this.tokenRepository = tokenRepository;
     }
 
+    // Gera e envia token recebendo diretamente o telemóvel
     @Transactional
-    public void generateAndSendToken(Long userId) {
-        User user = userService.findById(userId);
+    public void generateAndSendTokenByPhone(String phone) {
+        User user = userRepository.findByPhone(phone)
+                .orElseThrow(() -> new BusinessException("Utilizador não encontrado com este telemóvel."));
 
-        // Gera um código aleatório de 6 dígitos
-        String code = String.format("%06d", new Random().nextInt(999999));
+        tokenRepository.findByUser(user).ifPresent(tokenRepository::delete);
+
+        // Gera código de 6 dígitos (000000 a 999999)
+        String code = String.format("%06d", new Random().nextInt(1000000));
 
         VerificationToken verificationToken = new VerificationToken(code, user);
         tokenRepository.save(verificationToken);
 
-        // Envia por SMS (mock)
+        // Dispara o SMS simulado
         smsService.sendVerificationSms(user.getPhone(), code);
     }
 
-    public boolean verifyToken(String tokenStr) {
+    // Valida o token associado ao telemóvel
+    @Transactional
+    public boolean verifyToken(String phone, String tokenStr) {
         VerificationToken verificationToken = tokenRepository.findByToken(tokenStr)
-                .orElseThrow(() -> new BusinessException("Token inválido."));
+                .orElseThrow(() -> new BusinessException("Código inválido."));
+
+        // Confere se o token pertence ao telemóvel em validação
+        if (!verificationToken.getUser().getPhone().equals(phone)) {
+            throw new BusinessException("Código não corresponde a este utilizador.");
+        }
 
         if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new BusinessException("O token expirou.");
+            throw new BusinessException("O código expirou.");
         }
+
+        // Remove ou invalida o token para não ser reutilizado
+        tokenRepository.delete(verificationToken);
 
         return true;
     }
