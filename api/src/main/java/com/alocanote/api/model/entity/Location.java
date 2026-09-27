@@ -22,15 +22,15 @@ public class Location {
     private String address;
 
     @Column(nullable = false)
-    private String cep; // Novo campo para o CEP (Ex: 58038-000)
+    private String cep;
 
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reservation> reservations;
 
-    //Construtores,
+
     public Location() {}
 
-    // Getters e Setters
+
     public Long getId() {
         return id;
     }

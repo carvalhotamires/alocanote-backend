@@ -17,7 +17,7 @@ public class VerificationToken {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String token; // Código de 6 dígitos enviado por SMS
+    private String token;
 
     @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "user_id")
@@ -34,7 +34,7 @@ public class VerificationToken {
         this.expiryDate = LocalDateTime.now().plusMinutes(EXPIRATION_MINUTES);
     }
 
-    // Getters e Setters
+
     public Long getId() {
         return id;
     }

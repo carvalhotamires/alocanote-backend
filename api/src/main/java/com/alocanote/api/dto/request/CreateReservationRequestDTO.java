@@ -21,5 +21,5 @@ public record CreateReservationRequestDTO(
         @NotNull(message = "O ID do local de retirada é obrigatório.")
         Long locationId,
 
-        String purpose // Finalidade/Justificativa do uso (ex: Medição de obra)
+        String purpose
 ) {}

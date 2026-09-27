@@ -20,15 +20,12 @@ public class UserController {
         this.userService = userService;
     }
 
-    // Endpoint para registrar as colaboradoras da loja
     @PostMapping("/register")
     public ResponseEntity<User> register(@Valid @RequestBody RegisterUserRequestDTO requestDTO) {
-        // Chama a regra de negócio completa que a Tamires criou
         User newUser = userService.createUser(requestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
     }
 
-    // Endpoint para listar as usuárias
     @GetMapping
     public ResponseEntity<List<User>> listarTodos() {
         List<User> users = userService.findAll();

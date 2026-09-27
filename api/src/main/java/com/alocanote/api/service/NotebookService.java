@@ -4,6 +4,7 @@ import com.alocanote.api.model.entity.Notebook;
 import com.alocanote.api.model.enums.NotebookStatus;
 import com.alocanote.api.repository.NotebookRepository;
 import com.alocanote.api.exception.ResourceNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +20,11 @@ public class NotebookService {
 
     public List<Notebook> findAll() {
         return notebookRepository.findAll();
+    }
+
+    @Transactional
+    public Notebook createNotebook(Notebook notebook) {
+        return notebookRepository.save(notebook);
     }
 
     public Notebook findById(Long id) {

@@ -13,10 +13,10 @@ import java.util.List;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
-    // verifica se o computador já está ocupado
+
     List<Reservation> findByNotebookIdAndStatus(Long notebookId, ReservationStatus status);
 
-    // lista o histórico de reservas de um colaborador
+
     List<Reservation> findByUserId(Long userId);
 
     // NOVO: Verifica se existe conflito de horário para o mesmo notebook
