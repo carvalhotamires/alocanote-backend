@@ -6,8 +6,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 @Table(name = "reservations")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Reservation {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -39,13 +40,16 @@ public class Reservation {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "notebook_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "reservations"})
     private Notebook notebook;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "reservations"})
     private Location location;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "reservations", "password"})
     private User user;
 }

@@ -1,5 +1,6 @@
 package com.alocanote.api.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore; // <-- IMPORT ADICIONADO
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -13,6 +14,7 @@ import java.util.List;
 @Table(name = "locations")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Location {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,12 +28,11 @@ public class Location {
     @Column(nullable = false)
     private String cep;
 
+    @JsonIgnore // <-- ADICIONADO AQUI PARA CORTAR A RECURSÃO
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reservation> reservations;
 
-
     public Location() {}
-
 
     public Long getId() {
         return id;
@@ -47,6 +48,10 @@ public class Location {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String address() {
+        return address;
     }
 
     public String getAddress() {
@@ -73,6 +78,3 @@ public class Location {
         this.reservations = reservations;
     }
 }
-
-
-
